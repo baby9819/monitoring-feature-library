@@ -1,0 +1,143 @@
+{
+  "version": "1.0.0",
+  "description": "Feature library for AI-powered monitoring backend",
+  "system_features": [
+    {
+      "id": "sys_cpu_usage",
+      "name": "CPU Usage",
+      "category": "system_metric",
+      "type": "continuous",
+      "unit": "percent",
+      "description": "Total CPU utilization percentage",
+      "threshold": {
+        "warning": 70,
+        "critical": 90
+      }
+    },
+    {
+      "id": "sys_mem_usage",
+      "name": "Memory Usage",
+      "category": "system_metric",
+      "type": "continuous",
+      "unit": "percent",
+      "description": "System memory utilization percentage",
+      "threshold": {
+        "warning": 75,
+        "critical": 90
+      }
+    },
+    {
+      "id": "sys_disk_usage",
+      "name": "Disk Usage",
+      "category": "system_metric",
+      "type": "continuous",
+      "unit": "percent",
+      "description": "Disk partition utilization percentage",
+      "threshold": {
+        "warning": 80,
+        "critical": 95
+      }
+    },
+    {
+      "id": "sys_network_rx",
+      "name": "Network Receive",
+      "category": "system_metric",
+      "type": "continuous",
+      "unit": "bytes/sec",
+      "description": "Network incoming traffic rate"
+    },
+    {
+      "id": "sys_network_tx",
+      "name": "Network Transmit",
+      "category": "system_metric",
+      "type": "continuous",
+      "unit": "bytes/sec",
+      "description": "Network outgoing traffic rate"
+    },
+    {
+      "id": "sys_load_avg",
+      "name": "System Load Average",
+      "category": "system_metric",
+      "type": "continuous",
+      "description": "1-minute system load average"
+    }
+  ],
+  "application_features": [
+    {
+      "id": "app_request_count",
+      "name": "Request Count",
+      "category": "application_metric",
+      "type": "count",
+      "unit": "requests/sec",
+      "description": "Total incoming HTTP requests per second"
+    },
+    {
+      "id": "app_response_time",
+      "name": "Response Time",
+      "category": "application_metric",
+      "type": "continuous",
+      "unit": "milliseconds",
+      "description": "Average response latency",
+      "threshold": {
+        "warning": 500,
+        "critical": 1000
+      }
+    },
+    {
+      "id": "app_error_rate",
+      "name": "Error Rate",
+      "category": "application_metric",
+      "type": "continuous",
+      "unit": "percent",
+      "description": "Percentage of 5xx errors",
+      "threshold": {
+        "warning": 1,
+        "critical": 5
+      }
+    },
+    {
+      "id": "app_active_connections",
+      "name": "Active Connections",
+      "category": "application_metric",
+      "type": "count",
+      "description": "Number of active connections"
+    }
+  ],
+  "business_features": [
+    {
+      "id": "biz_active_users",
+      "name": "Active Users",
+      "category": "business_metric",
+      "type": "count",
+      "description": "Number of active users in current window"
+    },
+    {
+      "id": "biz_transactions",
+      "name": "Transactions",
+      "category": "business_metric",
+      "type": "count",
+      "description": "Number of processed business transactions"
+    }
+  ],
+  "anomaly_detection_features": [
+    {
+      "id": "ad_deviation_score",
+      "name": "Deviation Score",
+      "category": "ai_feature",
+      "description": "Statistical deviation from baseline"
+    },
+    {
+      "id": "ad_prediction_error",
+      "name": "Prediction Error",
+      "category": "ai_feature",
+      "description": "Prediction residual from time series model"
+    },
+    {
+      "id": "ad_is_anomaly",
+      "name": "Is Anomaly",
+      "category": "ai_label",
+      "type": "binary",
+      "description": "Binary anomaly classification result"
+    }
+  ]
+}
