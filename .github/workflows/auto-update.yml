@@ -1,0 +1,95 @@
+# GitHub Actions 自动更新工作流
+# 当有新的 commit 推送到 main 分支时，自动触发更新
+# 可以自动检查特征库格式，并重新生成预览文档
+name: Auto Update Feature Library
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # 支持手动触发
+jobs:
+  validate:
+    name: Validate Feature Library
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Validate JSON format
+        run: |
+          echo "🔍 Validating monitoring_features.json..."
+          python -m json.tool monitoring_features.json > /dev/null
+          echo "✅ JSON format is valid!"
+      - name: Generate feature count summary
+        run: |
+          python -c "
+          import json
+          with open('monitoring_features.json', 'r', encoding='utf-8') as f:
+              data = json.load(f)
+          total = 0
+          for key in data:
+              if key.endswith('_features') and isinstance(data[key], list):
+                  total += len(data[key])
+          print(f'📊 Total features: {total}')
+          "
+        shell: bash
+  update-docs:
+    name: Update Documentation
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Generate README from template
+        run: |
+          echo "📝 Updating documentation..."
+          python3 - << 'EOF'
+import json
+with open('monitoring_features.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
+# Count features by category
+stats = {}
+for key in data:
+    if key.endswith('_features') and isinstance(data[key], list):
+        category_name = key.replace('_', ' ').title()
+        stats[category_name] = len(data[key])
+total_features = sum(stats.values())
+readme_template = f"""# 监测后台 AI 特征库
+这是监测后台系统使用的特征定义库，包含系统指标、应用指标、业务指标和AI异常检测相关特征。
+## 📊 特征统计
+- **版本**: {data['version']}
+- **总特征数**: **{total_features}**
+"""
+for cat, count in stats.items():
+    readme_template += f"- **{cat}**: {count} 个\n"
+readme_template += """
+## 特征分类
+- **系统指标**: CPU、内存、磁盘、网络、负载等基础系统资源监控
+- **应用指标**: 请求数、响应时间、错误率等应用层监控
+- **业务指标**: 活跃用户、交易数等业务指标
+- **AI特征**: 异常检测相关计算特征
+## 使用方式
+直接导入 JSON 文件即可获取完整特征定义用于模型训练或实时监测。
+```python
+import json
+with open('monitoring_features.json', 'r', encoding='utf-8') as f:
+    features = json.load(f)
+# 使用特征定义
+for feature in features['system_features']:
+    print(f\"Feature: {feature['name']} ({feature['unit']})\")
+```
+## 自动更新
+本项目使用 GitHub Actions 自动验证和更新文档，每次推送到 main 分支都会自动检查：
+1. ✅ JSON 格式验证
+2. 📊 特征统计更新
+3. 📝 文档自动生成
+## License
+MIT
+"""
+with open('README.md', 'w', encoding='utf-8') as f:
+    f.write(readme_template)
+EOF
+          echo "✅ Documentation updated!"
+      - name: Commit updated README
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: auto-update feature stats 🤖"
+          file_pattern: README.md
